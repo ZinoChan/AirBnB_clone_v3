@@ -34,7 +34,7 @@ class User(BaseModel, Base):
         """ getter for hash pass"""
         return self._password
 
-    @property
+    @password.setter
     def password(self, pwd):
         """setter for hashed pass"""
         self._password = hashlib.md5(pwd.encode()).hexdigest()
