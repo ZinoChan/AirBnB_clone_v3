@@ -98,22 +98,14 @@ def places_search():
             places.extend(get_places_from_states(data))
 
         if data.get("cities"):
-            if places:
-                cities_places = get_places_from_cities(data)
-                places = [place for place in places if place in cities_places]
-            else:
-                places = get_places_from_cities(data)
+            for place in get_places_from_cities(data):
+                if place not in places:
+                    places.append(place)
 
         if data.get("amenities"):
             if not places:
                 places = storage.all(Place).values()
-                places = filter_places_by_amenities(places, data["amenities"])
-            else:
-                amenities_places = filter_places_by_amenities(
-                    places, data["amenities"]
-                )
-                places = [place for place in places if
-                          place in amenities_places]
+            places = filter_places_by_amenities(places, data["amenities"])
     # resolving the unserialized amenities issue
     places_dicts = [place.to_dict() for place in places]
     for place_dict in places_dicts:
