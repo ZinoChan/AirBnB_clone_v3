@@ -6,6 +6,8 @@ from models.city import City
 from models.user import User
 from models.place import Place
 from api.v1.views import app_views
+from models.state import State
+from models.amenity import Amenity
 
 
 @app_views.route("/cities/<city_id>/places", methods=["GET"],
@@ -77,3 +79,61 @@ def update_place(place_id):
             setattr(place, key, value)
     place.save()
     return jsonify(place.to_dict()), 200
+
+
+# Searching
+@app_views.route("/places_search", methods=["POST"])
+def places_search():
+    data = request.get_json()
+
+    if not data:
+        abort(400, "Not a JSON")
+
+    if not data or (not data.get("states") and not
+                    data.get("cities") and not data.get("amenities")):
+        places = storage.all(Place).values()
+    else:
+        places = []
+        if data.get("states"):
+            places.extend(get_places_from_states(data))
+
+        if data.get("cities"):
+            places.extend(get_places_from_cities(data))
+
+        if data.get("amenities"):
+            places = filter_places_by_amenities(places, data["amenities"])
+
+    return jsonify([place.to_dict() for place in places])
+
+
+def get_places_from_states(data):
+    places = []
+    for state_id in data["states"]:
+        state = storage.get(State, state_id)
+        if state:
+            for city in state.cities:
+                for place in city.places:
+                    if place not in places:
+                        places.append(place)
+    return places
+
+
+def get_places_from_cities(data):
+    places = []
+    for city_id in data["cities"]:
+        city = storage.get(City, city_id)
+        if city:
+            for place in city.places:
+                if place not in places:
+                    places.append(place)
+    return places
+
+
+def filter_places_by_amenities(places, amenity_ids):
+    amenities = [storage.get(Amenity, amenity_id)
+                 for amenity_id in amenity_ids]
+    return [
+        place
+        for place in places
+        if all(amenity in place.amenities for amenity in amenities)
+    ]
