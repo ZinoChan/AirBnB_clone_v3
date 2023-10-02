@@ -89,8 +89,8 @@ def places_search():
     if not data:
         abort(400, "Not a JSON")
 
-    if not data or (not data.get("states") and not
-                    data.get("cities") and not data.get("amenities")):
+    if not data or (not data.get("states") and not data.get("cities")
+                    and not data.get("amenities")):
         places = storage.all(Place).values()
     else:
         places = []
@@ -98,16 +98,26 @@ def places_search():
             places.extend(get_places_from_states(data))
 
         if data.get("cities"):
-            places.extend(get_places_from_cities(data))
+            if places:
+                cities_places = get_places_from_cities(data)
+                places = [place for place in places if place in cities_places]
+            else:
+                places = get_places_from_cities(data)
 
         if data.get("amenities"):
             if not places:
                 places = storage.all(Place).values()
-            places = filter_places_by_amenities(places, data["amenities"])
+                places = filter_places_by_amenities(places, data["amenities"])
+            else:
+                amenities_places = filter_places_by_amenities(
+                    places, data["amenities"]
+                )
+                places = [place for place in places if
+                          place in amenities_places]
     # resolving the unserialized amenities issue
     places_dicts = [place.to_dict() for place in places]
     for place_dict in places_dicts:
-        place_dict.pop('amenities', None)
+        place_dict.pop("amenities", None)
 
     return jsonify(places_dicts)
 
