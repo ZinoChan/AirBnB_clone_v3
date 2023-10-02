@@ -82,7 +82,8 @@ def update_place(place_id):
 
 
 # Searching
-@app_views.route("/places_search", methods=["POST"])
+@app_views.route("/places_search", methods=["POST"],
+                 strict_slashes=False)
 def places_search():
     data = request.get_json()
 
