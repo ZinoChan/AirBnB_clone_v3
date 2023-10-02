@@ -102,8 +102,16 @@ def places_search():
 
         if data.get("amenities"):
             places = filter_places_by_amenities(places, data["amenities"])
+    # resolving the unserialized amenities issue
+    places_dicts = []
+    for place in places:
+        place_dict = place.to_dict()
+        if 'amenities' in place_dict:
+            place_dict['amenities'] = [amenity.to_dict() for
+                                       amenity in place.amenities]
+        places_dicts.append(place_dict)
 
-    return jsonify([place.to_dict() for place in places])
+    return jsonify(places_dicts)
 
 
 def get_places_from_states(data):
