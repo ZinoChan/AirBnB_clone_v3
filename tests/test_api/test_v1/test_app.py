@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import unittest
-from flask import Flask
 from api.v1.app import app
 
 class TestApp(unittest.TestCase):
