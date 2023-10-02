@@ -101,6 +101,8 @@ def places_search():
             places.extend(get_places_from_cities(data))
 
         if data.get("amenities"):
+            if not places:
+                places = storage.all(Place).values()
             places = filter_places_by_amenities(places, data["amenities"])
     # resolving the unserialized amenities issue
     places_dicts = [place.to_dict() for place in places]
