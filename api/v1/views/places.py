@@ -99,7 +99,7 @@ def places_search():
             places.extend(get_places_from_states(data))
 
         if data.get("cities"):
-            places.extend(get_places_from_cities(places, data))
+            places = get_places_from_cities(places, data)
 
         if data.get("amenities"):
             if not places:
