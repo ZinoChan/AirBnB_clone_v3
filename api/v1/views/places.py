@@ -85,15 +85,16 @@ def update_place(place_id):
 @app_views.route("/places_search", methods=["POST"],
                  strict_slashes=False)
 def places_search():
-    """Doooocs"""
+    """Search places"""
     data = request.get_json()
 
-    if not data:
+    if data is None:
         abort(400, "Not a JSON")
 
-    if not data or (not data.get("states") and not
-                    data.get("cities") and not data.get("amenities")):
+    if not data or all(not data[key] for key in
+                       ("states", "cities", "amenities")):
         places = storage.all(Place).values()
+        return jsonify([place.to_dict() for place in places])
     else:
         places = []
         if data.get("states"):
