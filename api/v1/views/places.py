@@ -85,6 +85,7 @@ def update_place(place_id):
 @app_views.route("/places_search", methods=["POST"],
                  strict_slashes=False)
 def places_search():
+    """Doooocs"""
     data = request.get_json()
 
     if not data:
