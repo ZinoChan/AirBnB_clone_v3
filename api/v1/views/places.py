@@ -99,7 +99,7 @@ def places_search():
             places.extend(get_places_from_states(data))
 
         if data.get("cities"):
-            places.extend(get_places_from_cities(data))
+            places.extend(get_places_from_cities(places, data))
 
         if data.get("amenities"):
             if not places:
@@ -125,8 +125,7 @@ def get_places_from_states(data):
     return places
 
 
-def get_places_from_cities(data):
-    places = []
+def get_places_from_cities(places, data):
     for city_id in data["cities"]:
         city = storage.get(City, city_id)
         if city:
