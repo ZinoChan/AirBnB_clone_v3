@@ -94,7 +94,6 @@ def places_search():
     if not data or all(not data[key] for key in
                        ("states", "cities", "amenities")):
         places = storage.all(Place).values()
-        return jsonify([place.to_dict() for place in places])
     else:
         places = []
         if data.get("states"):
